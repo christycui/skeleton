@@ -4,6 +4,7 @@ import api.CreateReceiptRequest;
 import api.ReceiptResponse;
 import dao.ReceiptDao;
 import generated.tables.records.ReceiptsRecord;
+import jdk.nashorn.internal.objects.annotations.Getter;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
