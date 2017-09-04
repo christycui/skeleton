@@ -16,12 +16,6 @@ public class HelloWorldController {
     // You can specify additional @Path steps; they will be relative
     // to the @Path defined at the class level
     @GET
-    @Path("/hello")
-    public String helloWorld(@Session HttpSession session) {
-        return "Hello World " + session.toString();
-    }
-
-    @GET
     @Path("/netid")
     public String netid() {
         return "hc935";

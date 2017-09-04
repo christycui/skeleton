@@ -1,11 +1,8 @@
 package controllers;
 
-import api.CreateTagRequest;
 import api.TagResponse;
 import dao.TagDao;
 import generated.tables.records.TagsRecord;
-import jdk.nashorn.internal.objects.annotations.Getter;
-import sun.font.TrueTypeFont;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -25,14 +22,12 @@ public class TagController {
     }
 
     @PUT
-    public void toggleTag(@PathParam("tag") String tagName, @Valid @NotNull CreateTagRequest tag) {
+    public void toggleTag(@PathParam("tag") String tagName, int receipt_id) {
         // check if tag already exists for receipt
-        if (tags.check(tagName, tag.receipt_id) == -1) {
-            System.out.println("check");
-            tags.insert(tagName, tag.receipt_id);
+        if (tags.check(tagName, receipt_id) == -1) {
+            tags.insert(tagName, receipt_id);
         } else {
-            System.out.println("delete");
-            tags.delete(tagName, tag.receipt_id);
+            tags.delete(tagName, receipt_id);
         }
     }
 
