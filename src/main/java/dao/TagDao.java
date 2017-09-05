@@ -21,7 +21,7 @@ public class TagDao {
 
     public int insert(String tagName, Integer receiptId) {
         TagsRecord tagsRecord = dsl
-                .insertInto(TAGS, TAGS.TAG_NAME, TAGS.RECEIPT_ID)
+                .insertInto(TAGS, TAGS.TAG_NAME, TAGS.ID)
                 .values(tagName, receiptId)
                 .returning(TAGS.ID)
                 .fetchOne();
@@ -32,11 +32,11 @@ public class TagDao {
     }
 
     public int check(String tagName, Integer receiptId) {
-        return dsl.selectFrom(TAGS).where(TAGS.TAG_NAME.eq(tagName)).and(TAGS.RECEIPT_ID.eq(receiptId)).fetch().getValues(TAGS.TAG_NAME).indexOf(tagName);
+        return dsl.selectFrom(TAGS).where(TAGS.TAG_NAME.eq(tagName)).and(TAGS.ID.eq(receiptId)).fetch().getValues(TAGS.TAG_NAME).indexOf(tagName);
     }
 
     public void delete(String tagName, Integer receiptId) {
-        dsl.delete(TAGS).where(TAGS.TAG_NAME.eq(tagName)).and(TAGS.RECEIPT_ID.eq(receiptId)).execute();
+        dsl.delete(TAGS).where(TAGS.TAG_NAME.eq(tagName)).and(TAGS.ID.eq(receiptId)).execute();
     }
 
     public List<TagsRecord> getTags(String tagName) {

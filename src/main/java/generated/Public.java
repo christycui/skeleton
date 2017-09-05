@@ -31,7 +31,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-	private static final long serialVersionUID = -845787536;
+	private static final long serialVersionUID = 419145256;
 
 	/**
 	 * The reference instance of <code>public</code>
@@ -54,8 +54,7 @@ public class Public extends SchemaImpl {
 
 	private final List<Sequence<?>> getSequences0() {
 		return Arrays.<Sequence<?>>asList(
-			Sequences.SYSTEM_SEQUENCE_9134D2AD_5121_4366_AD26_2CB9BB55E742,
-			Sequences.SYSTEM_SEQUENCE_A0F7E098_C9E7_4653_B550_73BBCF1950F0);
+			Sequences.SYSTEM_SEQUENCE_A7EAD587_D534_4888_96C9_0C0B3D7A41F8);
 	}
 
 	@Override

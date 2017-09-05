@@ -36,7 +36,6 @@ public class Keys {
 	// -------------------------------------------------------------------------
 
 	public static final Identity<ReceiptsRecord, Integer> IDENTITY_RECEIPTS = Identities0.IDENTITY_RECEIPTS;
-	public static final Identity<TagsRecord, Integer> IDENTITY_TAGS = Identities0.IDENTITY_TAGS;
 
 	// -------------------------------------------------------------------------
 	// UNIQUE and PRIMARY KEY definitions
@@ -57,7 +56,6 @@ public class Keys {
 
 	private static class Identities0 extends AbstractKeys {
 		public static Identity<ReceiptsRecord, Integer> IDENTITY_RECEIPTS = createIdentity(Receipts.RECEIPTS, Receipts.RECEIPTS.ID);
-		public static Identity<TagsRecord, Integer> IDENTITY_TAGS = createIdentity(Tags.TAGS, Tags.TAGS.ID);
 	}
 
 	private static class UniqueKeys0 extends AbstractKeys {
@@ -66,6 +64,6 @@ public class Keys {
 	}
 
 	private static class ForeignKeys0 extends AbstractKeys {
-		public static final ForeignKey<TagsRecord, ReceiptsRecord> CONSTRAINT_27 = createForeignKey(generated.Keys.CONSTRAINT_F, Tags.TAGS, Tags.TAGS.RECEIPT_ID);
+		public static final ForeignKey<TagsRecord, ReceiptsRecord> CONSTRAINT_27 = createForeignKey(generated.Keys.CONSTRAINT_F, Tags.TAGS, Tags.TAGS.ID);
 	}
 }
