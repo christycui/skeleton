@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+        <style>
+            .hide {
+                display: none;
+            }
+        </style>
+        <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+        <script>
+            var appendReceipts = function(url) {
+                $.getJSON(url, function(receipts) {
+                    for(var i = 0; i < receipts.length; i++) {
+                        var receipt = receipts[i];
+                        $(`<tr class="receipt" id=${receipt.id}><td>${receipt.created}</td><td class="merchant">${receipt.merchantName}</td><td class="amount">${receipt.value}</td><td><button type="button" class="btn btn-outline-primary add-tag">Add +</button></td></tr>`)
+                            .appendTo($("#receiptList > table > tbody"));
+                    }
+                });
+            };
+            $(function(){
+                // display all receipts
+                appendReceipts("/receipts");
+
+                $.getJSON("/tags", function(tags) {
+                    for (var i = 0; i < tags.length; i++) {
+                        var tag = tags[i];
+                        $(`<button type="button" class="btn btn-outline-success tags tagValue"><span class='tagValue'>${tag.tagName}</span> x</button>`)
+                        .prependTo($("#" + tag.id + " > td").last());
+                    }
+                });
+
+                $("#cancel-receipt").click(function(event) {
+                    event.preventDefault();
+                    $("form").addClass("hide");
+                });
+
+                $("#add-receipt").click(function(event) {
+                    event.preventDefault();
+                    $("form").removeClass("hide");
+                });
+
+                $("#save-receipt").click(function(event) {
+                    event.preventDefault();
+                    $.ajax({
+                      type: 'POST',
+                      url: "/receipts",
+                      contentType: 'application/json',
+                      data: JSON.stringify({merchant: $('#merchant').val(), amount: $('#amount').val()}),
+                      dataType: 'json',
+                      success: function(data) {
+                        appendReceipts("/receipts/"+data);
+                        $("#merchant").val("");
+                        $("#amount").val("");
+                      },
+                      error: function(jqXHR, textStatus, errorThrown) {
+                        $("form").append("<p color='red'>One or more fields are invalid.</p>");
+                      }
+                    });
+                });
+
+                $(document).on('click', '.add-tag', function() {
+                    $(this).after("<input class='tag_input'></input>");
+                });
+
+                $(document).keypress(function(e) {
+                    // if user hits enter
+                    if (e.which == 13) {
+                        var target = ".tag_input";
+                        var tag = $(target).val();
+                        var receipt_id = $(target).parent().parent().attr("id");
+
+                        $.ajax({
+                            method: 'PUT',
+                            url: '/tags/' + tag,
+                            contentType: 'application/json',
+                            data: receipt_id,
+                            success: function() {
+                                // display new tag
+                                $(target).parent().prepend(`<button type="button" class="btn btn-outline-success tags"><span class='tagValue'>${tag}</span> x</button>`);
+                                // remove input box
+                                $(target).remove();
+                            },
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                $(target).after("<p>There was an error.</p>");
+                            }
+                        });
+                    }
+                });
+
+                $(document).on('click', '.tags', function() {
+                    var tag = $(this).children('.tagValue').text();
+                    var receipt_id = $(this).parent().parent().attr("id");
+                    $.ajax({
+                        method: 'PUT',
+                        url: '/tags/' + tag,
+                        contentType: 'application/json',
+                        data: receipt_id,
+                        success: $(this).remove(),
+                        error: $("this").after("<p>There was an error.</p>")
+                    })
+                });
+            })
+        </script>
+    </head>
+
+    <body class='container'>
+        <div class="card">
+            <div class="jumbotron">
+                <h1 class="display-3">My Receipts</h1>
+                <p class="lead">This is a simple application for you to organize your receipts.</p>
+                <button type="button" class="btn btn-primary btn-large" id="add-receipt">Add a Receipt</button>
+                <form class="hide">
+                    <div class="row">
+                      <div class="form-group col-md-3">
+                        <label for="merchant">Merchant</label>
+                        <input type="merchant" class="form-control" id="merchant">
+                      </div>
+                    </div>
+                    <div class="row">
+                      <div class="form-group col-md-3">
+                        <label for="amount">Amount</label>
+                        <input type="amount" class="form-control" id="amount">
+                      </div>
+                    </div>
+                  <button type="cancel" class="btn btn-primary" id="cancel-receipt">Cancel</button>
+                  <button type="submit" class="btn btn-primary" id="save-receipt">Save</button>
+                </form>
+            </div>
+        </div>
+        <div id='receiptList'>
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Merchant</th>
+                  <th>Amount</th>
+                  <th>Tags</th>
+                </tr>
+              </thead>
+              <tbody>
+                
+              </tbody>
+            </table>
+        </div>
+    </body>
+</html>

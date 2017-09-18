@@ -13,8 +13,7 @@ CREATE TABLE tags (
   created TIME DEFAULT CURRENT_TIME(),
   tag_name VARCHAR(255) NOT NULL,
 
-  PRIMARY KEY (id),
-  INDEX tag_ind (id),
+
   FOREIGN KEY (id)
   REFERENCES receipts(id)
     ON DELETE CASCADE

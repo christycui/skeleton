@@ -30,8 +30,15 @@ public class ReceiptController {
     }
 
     @GET
-    public List<ReceiptResponse> getReceipts() {
+    public List<ReceiptResponse> getAllReceipts() {
         List<ReceiptsRecord> receiptRecords = receipts.getAllReceipts();
+        return receiptRecords.stream().map(ReceiptResponse::new).collect(toList());
+    }
+
+    @Path("/{id}")
+    @GET
+    public List<ReceiptResponse> getAllReceipts(@PathParam("id") int id) {
+        List<ReceiptsRecord> receiptRecords = receipts.getReceipts(id);
         return receiptRecords.stream().map(ReceiptResponse::new).collect(toList());
     }
 }
