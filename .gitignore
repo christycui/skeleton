@@ -10,3 +10,5 @@
 
 # This is where intellij builds the project
 /out
+
+gc_api_file.json
