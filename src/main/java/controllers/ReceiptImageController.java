@@ -10,6 +10,9 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static java.lang.System.out;
 
 @Path("/images")
@@ -56,12 +59,31 @@ public class ReceiptImageController {
                 out.printf("Text: %s\n", annotation.getDescription());
                 String text = annotation.getDescription();
                 String[] textList = text.split("\n");
+
+                // match for merchant name
+                for (int i=1; i<textList.length; i++) {
+                    Pattern p = Pattern.compile("(\\w+ \\w+)");
+                    Matcher m = p.matcher(textList[i]);
+                    if (m.find()) {
+                        merchantName = m.group(1);
+                        break;
+                    }
+                }
                 merchantName = textList[0];
-                out.printf("amountText: %s\n", textList[textList.length-1]);
-                amount = new BigDecimal(textList[textList.length-1].replace("$", ""));
+                
+                // match for amount
+                for (int i=textList.length-1; i>0; i--) {
+                    Pattern p = Pattern.compile("(\\d+.\\d\\d)");
+                    Matcher m = p.matcher(textList[i]);
+                    if (m.find()) {
+                        amount = new BigDecimal(m.group(1));
+                        break;
+                    }
+                }
                 break;
             }
-
+            out.printf("merchantName: %s\n", merchantName);
+            out.printf("amount: %s\n", amount);
             //TextAnnotation fullTextAnnotation = res.getFullTextAnnotation();
             return new ReceiptSuggestionResponse(merchantName, amount);
         }

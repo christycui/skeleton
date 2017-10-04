@@ -41,14 +41,14 @@
 
             function takeSnapshot() {
               // create a CANVAS element that is same size as the image
-              imageCapture.takePhoto()
+              imageCapture.grabFrame()
               .then(blob => createImageBitmap(blob))
               .then(img => {
                 var canvas = document.createElement('canvas');
                 canvas.width = img.width;
                 canvas.height = img.height;
                 canvas.getContext('2d').drawImage(img, 0, 0);
-                imageData = canvas.toDataURL('image/png');
+                imageData = canvas.toDataURL('image/png').split(',')[1];
 
                 $.ajax({
                       type: 'POST',
@@ -63,6 +63,8 @@
                         $("#vidwrap").addClass('hide');
                         // put in form and new data
                         $("form").removeClass("hide");
+                        $("#merchant").val(data.merchantName);
+                        $("#amount").val(data.amount);
                       },
                       error: console.log('error')
                     });
