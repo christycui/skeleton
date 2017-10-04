@@ -55,7 +55,10 @@ public class ReceiptImageController {
                 out.printf("Position : %s\n", annotation.getBoundingPoly());
                 out.printf("Text: %s\n", annotation.getDescription());
                 String text = annotation.getDescription();
-                merchantName = text;
+                String[] textList = text.split("\n");
+                merchantName = textList[0];
+                out.printf("amountText: %s\n", textList[textList.length-1]);
+                amount = new BigDecimal(textList[textList.length-1].replace("$", ""));
                 break;
             }
 

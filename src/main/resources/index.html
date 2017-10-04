@@ -3,12 +3,51 @@
     <head>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
         <style>
+            @import url("//netdna.bootstrapcdn.com/bootstrap/3.0.0-rc2/css/bootstrap-glyphicons.css");
             .hide {
                 display: none;
             }
+            video { width: 400px; height: 300px; border: 1px solid black; }
         </style>
         <script data-require="jquery@*" data-semver="3.1.1" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
         <script>
+            var imageCapture;
+
+            function attachMediaStream(mediaStream) {
+              $('video')[0].srcObject = mediaStream;
+              
+              // Saving the track allows us to capture a photo
+              const track = mediaStream.getVideoTracks()[0];
+              imageCapture = new ImageCapture(track);
+            }
+
+            function startVideo() {
+              navigator.mediaDevices.getUserMedia({video: {facingMode: { exact: "environment" }}})
+              .then(attachMediaStream)
+              .catch(error => {
+                navigator.mediaDevices.getUserMedia({video: true})
+                .then(attachMediaStream)
+                .catch(error => {
+                  console.log(error);
+                })
+              });
+            }        
+
+            function takeSnapshot() {
+              // create a CANVAS element that is same size as the image
+              imageCapture.takePhoto()
+              .then(blob => createImageBitmap(blob))
+              .then(img => {
+                var canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+              
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                console.log(canvas.toDataURL('image/png'));
+                $('BODY').append(canvas);
+              });
+            }
+
             var appendReceipts = function(url) {
                 $.getJSON(url, function(receipts) {
                     for(var i = 0; i < receipts.length; i++) {
@@ -19,6 +58,23 @@
                 });
             };
             $(function(){
+                $("#start-camera").click(function(event) {
+                  event.preventDefault();
+                  $("#vidwrap").removeClass("hide");
+                });
+
+                $("#take-pic-cancel").click(function(event) {
+                  event.preventDefault();
+                  $("#vidwrap").addClass("hide");
+                });
+
+                $('#start-camera').on('click', startVideo);
+                $('video').on('play', () => $('#take-pic').prop('disabled', false));
+                $('#take-pic').on('click', takeSnapshot);
+                $('#take-pic-cancel').on('click', function(mediaStream) {
+                  track.stop();
+                });
+
                 // display all receipts
                 appendReceipts("/receipts");
 
@@ -110,6 +166,20 @@
                 <h1 class="display-3">My Receipts</h1>
                 <p class="lead">This is a simple application for you to organize your receipts.</p>
                 <button type="button" class="btn btn-primary btn-large" id="add-receipt">Add a Receipt</button>
+                <button type="button" class="btn btn-primary btn-large" id="start-camera">
+                  <span class="glyphicon glyphicon-camera" aria-hidden="true"></span> Snap a Receipt
+                </button>
+
+                <div id="vidwrap" class="row hide">
+                  <div class="col-xs-6 col-md-3">
+                    <video autoplay class="thumbnail"></video>
+                    <div class="btn-group">
+                      <button id="take-pic-cancel" class="btn btn-large btn-danger">Cancel</button>
+                      <button id="take-pic" disabled="true" class="btn btn-large btn-success">Snap!</button>
+                    </div>
+                  </div>
+                </div>
+                
                 <form class="hide">
                     <div class="row">
                       <div class="form-group col-md-3">
