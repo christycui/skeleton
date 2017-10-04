@@ -48,12 +48,13 @@
                 canvas.width = img.width;
                 canvas.height = img.height;
                 canvas.getContext('2d').drawImage(img, 0, 0);
+                imageData = canvas.toDataURL('image/png');
 
                 $.ajax({
                       type: 'POST',
                       url: "/images",
                       contentType: 'text/plain',
-                      data: canvas.toDataURL('image/png'),
+                      data: imageData,
                       dataType: 'json',
                       success: function(data) {
                         console.log('success');
@@ -77,6 +78,24 @@
                     }
                 });
             };
+
+            var loadReceipts = function(url) {
+              $.getJSON(url, function(receipts) {
+                    for(var i = 0; i < receipts.length; i++) {
+                        var receipt = receipts[i];
+                        $(`<tr class="receipt" id=${receipt.id}><td>${receipt.created}</td><td class="merchant">${receipt.merchantName}</td><td class="amount">${receipt.value}</td><td><button type="button" class="btn btn-outline-primary add-tag">Add +</button></td></tr>`)
+                            .appendTo($("#receiptList > table > tbody"));
+                    }
+                }).then(function() {
+                  $.getJSON("/tags", function(tags) {
+                    for (var i = 0; i < tags.length; i++) {
+                        var tag = tags[i];
+                        $(`<button type="button" class="btn btn-outline-success tags tagValue"><span class='tagValue'>${tag.tagName}</span> x</button>`)
+                        .prependTo($("#" + tag.id + " > td").last());
+                    }
+                  });
+                });
+            }
             $(function(){
                 $("#start-camera").click(function(event) {
                   event.preventDefault();
@@ -93,18 +112,7 @@
                 $('#take-pic').on('click', takeSnapshot);
                 $('#take-pic-cancel').on('click', stopVideo);
 
-                // display all receipts
-                $.when(appendReceipts("/receipts")).done(function() {
-                  $.getJSON("/tags", function(tags) {
-                    for (var i = 0; i < tags.length; i++) {
-                        var tag = tags[i];
-                        $(`<button type="button" class="btn btn-outline-success tags tagValue"><span class='tagValue'>${tag.tagName}</span> x</button>`)
-                        .prependTo($("#" + tag.id + " > td").last());
-                    }
-                  });
-                });
-
-                
+                loadReceipts("/receipts");
 
                 $("#cancel-receipt").click(function(event) {
                     event.preventDefault();
