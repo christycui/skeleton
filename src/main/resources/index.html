@@ -31,7 +31,13 @@
                   console.log(error);
                 })
               });
-            }        
+            }
+
+            function stopVideo() {
+              mediaStream = $('video')[0].srcObject;
+              const track = mediaStream.getVideoTracks()[0];
+              track.stop();
+            }      
 
             function takeSnapshot() {
               // create a CANVAS element that is same size as the image
@@ -41,10 +47,24 @@
                 var canvas = document.createElement('canvas');
                 canvas.width = img.width;
                 canvas.height = img.height;
-              
                 canvas.getContext('2d').drawImage(img, 0, 0);
-                console.log(canvas.toDataURL('image/png'));
-                $('BODY').append(canvas);
+
+                $.ajax({
+                      type: 'POST',
+                      url: "/images",
+                      contentType: 'text/plain',
+                      data: canvas.toDataURL('image/png'),
+                      dataType: 'json',
+                      success: function(data) {
+                        console.log('success');
+                        // remove video
+                        stopVideo;
+                        $("#vidwrap").addClass('hide');
+                        // put in form and new data
+                        $("form").removeClass("hide");
+                      },
+                      error: console.log('error')
+                    });
               });
             }
 
@@ -71,20 +91,20 @@
                 $('#start-camera').on('click', startVideo);
                 $('video').on('play', () => $('#take-pic').prop('disabled', false));
                 $('#take-pic').on('click', takeSnapshot);
-                $('#take-pic-cancel').on('click', function(mediaStream) {
-                  track.stop();
-                });
+                $('#take-pic-cancel').on('click', stopVideo);
 
                 // display all receipts
-                appendReceipts("/receipts");
-
-                $.getJSON("/tags", function(tags) {
+                $.when(appendReceipts("/receipts")).done(function() {
+                  $.getJSON("/tags", function(tags) {
                     for (var i = 0; i < tags.length; i++) {
                         var tag = tags[i];
                         $(`<button type="button" class="btn btn-outline-success tags tagValue"><span class='tagValue'>${tag.tagName}</span> x</button>`)
                         .prependTo($("#" + tag.id + " > td").last());
                     }
+                  });
                 });
+
+                
 
                 $("#cancel-receipt").click(function(event) {
                     event.preventDefault();
