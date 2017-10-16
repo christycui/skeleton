@@ -1,11 +1,16 @@
-[![CircleCI](https://circleci.com/gh/amfleming/skeleton.svg?style=svg)](https://circleci.com/gh/amfleming/skeleton)
+[![CircleCI](https://circleci.com/gh/christycui/skeleton.svg?style=svg)](https://circleci.com/gh/christycui/skeleton)
 
 
 skeleton
 ============
-A super simple foundation for building a scalable RESTful HTTP servers
+A simple application for tracking your expenses by taking photos of your receipt
 
-To build and run with docker:
-1. Run `./gradlew distTar` _this tells gradle to make a .tar file containing the java application code and all dependencies_
-2. Run `docker build -t myapp .` _this runs the Dockerfile, and builds an image tagged with `myapp`.  See all images with `docker images`_
-3. Run `docker run -p 80:8080 myapp` _this runs the `myapp` image, routing port 80 on **Your Machine** to port 8080 in **the container**_
+## How to run
+1. Clone/download this repo: `git clone https://github.com/christycui/skeleton.git`
+2. Save your own Google Vision API in a file named `gc_api_file.json`
+3. Start application: `gradle run`
+4. find it at `http://localhost:8080`
+
+## Features
+1. RESTful HTTP Server
+2. Make use of Google Vision API to automate everyday chores
